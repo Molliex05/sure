@@ -22,13 +22,21 @@ module Assistant
 
     def function_classes
       [
+        # Read
         Function::GetTransactions,
         Function::GetAccounts,
         Function::GetHoldings,
         Function::GetBalanceSheet,
         Function::GetIncomeStatement,
         Function::ImportBankStatement,
-        Function::SearchFamilyFiles
+        Function::SearchFamilyFiles,
+        # Write — categories & rules
+        Function::SetCategory,
+        Function::UpdateTransactionCategory,
+        Function::CreateRule,
+        # Write — Hermes memory
+        Function::UpdateMemory,
+        Function::UpdateUserProfile
       ]
     end
 
