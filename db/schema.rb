@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_28_120000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_30_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -1605,6 +1605,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_28_120000) do
     t.string "locale"
     t.string "ui_layout"
     t.uuid "default_account_id"
+    t.text "ai_soul"
+    t.text "ai_user_profile"
+    t.text "ai_memory"
     t.index ["default_account_id"], name: "index_users_on_default_account_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["family_id"], name: "index_users_on_family_id"
