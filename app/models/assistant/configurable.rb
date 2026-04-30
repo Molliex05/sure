@@ -5,15 +5,16 @@ module Assistant::Configurable
     def config_for(chat)
       preferred_currency = Money::Currency.new(chat.user.family.currency)
       preferred_date_format = chat.user.family.date_format
+      user = chat.user
 
-      if chat.user.ui_layout_intro?
+      if user.ui_layout_intro?
         {
           instructions: intro_instructions(preferred_currency, preferred_date_format),
           functions: []
         }
       else
         {
-          instructions: default_instructions(preferred_currency, preferred_date_format),
+          instructions: default_instructions(preferred_currency, preferred_date_format, user),
           functions: default_functions
         }
       end
@@ -55,7 +56,9 @@ module Assistant::Configurable
         Assistant.function_classes
       end
 
-      def default_instructions(preferred_currency, preferred_date_format)
+      def default_instructions(preferred_currency, preferred_date_format, user = nil)
+        memory_section = hermes_memory_section(user)
+
         <<~PROMPT
           ## Your identity
 
@@ -109,7 +112,38 @@ module Assistant::Configurable
           - For functions that require dates, use the current date as your reference point: #{Date.current}
           - If you suspect that you do not have enough data to 100% accurately answer, be transparent about it and state exactly what
             the data you're presenting represents and what context it is in (i.e. date range, account, etc.)
+
+          ### Memory rules
+
+          - After every conversation, proactively call `update_memory` to persist new facts, patterns, or goals you learned.
+          - After every conversation, call `update_user_profile` if you noticed new preferences, habits, or life context.
+          - When creating categories or rules, always confirm with the user first.
+          - Before bulk-updating more than 10 transactions, always confirm with the user.
+
+          #{memory_section}
         PROMPT
+      end
+
+      def hermes_memory_section(user)
+        return "" if user.nil?
+
+        sections = []
+
+        if user.ai_soul.present?
+          sections << "## Your persona (SOUL)\n\n#{user.ai_soul}"
+        end
+
+        if user.ai_user_profile.present?
+          sections << "## About this user (USER)\n\n#{user.ai_user_profile}"
+        end
+
+        if user.ai_memory.present?
+          sections << "## Your memory (MEMORY)\n\n#{user.ai_memory}"
+        end
+
+        return "" if sections.empty?
+
+        "---\n\n" + sections.join("\n\n")
       end
   end
 end
