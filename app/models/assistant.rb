@@ -36,7 +36,15 @@ module Assistant
         Function::CreateRule,
         # Write — Hermes memory
         Function::UpdateMemory,
-        Function::UpdateUserProfile
+        Function::UpdateUserProfile,
+        # Read — metadata
+        Function::GetCategories,
+        Function::GetRules,
+        Function::GetMerchants,
+        # Write — transaction management
+        Function::SetTransactionNote,
+        Function::DeleteRule,
+        Function::ExcludeTransaction
       ]
     end
 
