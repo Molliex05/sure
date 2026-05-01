@@ -44,7 +44,14 @@ module Assistant
         # Write — transaction management
         Function::SetTransactionNote,
         Function::DeleteRule,
-        Function::ExcludeTransaction
+        Function::ExcludeTransaction,
+        # Read — budgets
+        Function::GetBudget,
+        # Write — budgets
+        Function::CreateBudget,
+        Function::UpdateBudget,
+        Function::DeleteBudget,
+        Function::SetCategoryBudget
       ]
     end
 
