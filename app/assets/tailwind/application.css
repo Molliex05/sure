@@ -125,10 +125,58 @@
 }
 
 .prose--ai-chat {
-  @apply break-words;
+  @apply break-words min-w-0;
 
-  p, li {
-    @apply text-sm text-primary;
+  p {
+    @apply text-sm text-primary mb-3;
+  }
+
+  p:last-child {
+    @apply mb-0;
+  }
+
+  li {
+    @apply text-sm text-primary mb-1;
+  }
+
+  ul {
+    @apply pl-4 mb-3 list-disc;
+  }
+
+  ol {
+    @apply pl-4 mb-3 list-decimal;
+  }
+
+  h1, h2, h3, h4 {
+    @apply text-sm font-semibold text-primary mt-4 mb-2;
+  }
+
+  h1:first-child, h2:first-child, h3:first-child {
+    @apply mt-0;
+  }
+
+  strong {
+    @apply font-semibold;
+  }
+
+  a {
+    @apply text-link underline;
+  }
+
+  code {
+    @apply text-xs font-mono bg-surface-inset text-secondary rounded px-1 py-0.5;
+  }
+
+  pre {
+    @apply bg-surface-inset rounded-lg p-3 mb-3 overflow-x-auto;
+  }
+
+  pre code {
+    @apply bg-transparent p-0 text-primary text-xs;
+  }
+
+  blockquote {
+    @apply border-l-2 border-primary pl-3 text-secondary mb-3;
   }
 
   scrollbar-width: thin;
@@ -144,7 +192,7 @@
 
   ::-webkit-scrollbar-thumb {
     background-color: rgba(156, 163, 175, 0.5);
-    border-radius: 3px; 
+    border-radius: 3px;
   }
 }
 
