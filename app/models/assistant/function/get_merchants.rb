@@ -15,10 +15,10 @@ class Assistant::Function::GetMerchants < Assistant::Function
     scope = scope.where(category_id: nil) if only_uncategorized
 
     merchants = scope
-      .group("merchants.id", "merchants.name")
+      .group(Arel.sql("merchants.id"), Arel.sql("merchants.name"))
       .order(Arel.sql("COUNT(*) DESC"))
       .limit(limit)
-      .pluck("merchants.id", "merchants.name", "COUNT(*)")
+      .pluck(Arel.sql("merchants.id"), Arel.sql("merchants.name"), Arel.sql("COUNT(*)"))
       .map { |id, name, count| { id: id, name: name, transaction_count: count } }
 
     { merchants: merchants, total: merchants.size }
