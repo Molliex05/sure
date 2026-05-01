@@ -16,7 +16,7 @@ class Assistant::Function::GetMerchants < Assistant::Function
 
     merchants = scope
       .group("merchants.id", "merchants.name")
-      .order("COUNT(*) DESC")
+      .order(Arel.sql("COUNT(*) DESC"))
       .limit(limit)
       .pluck("merchants.id", "merchants.name", "COUNT(*)")
       .map { |id, name, count| { id: id, name: name, transaction_count: count } }
