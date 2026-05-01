@@ -245,9 +245,11 @@ jobs:
           done
 
       - name: Trigger Coolify redeploy
-        if: ${{ github.ref == 'refs/heads/main' && secrets.COOLIFY_WEBHOOK_URL != '' }}
+        if: github.ref == 'refs/heads/main'
+        env:
+          COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
         run: |
-          curl -s -X GET "${{ secrets.COOLIFY_WEBHOOK_URL }}" || true
+          [ -n "$COOLIFY_WEBHOOK_URL" ] && curl -s -X GET "$COOLIFY_WEBHOOK_URL" || true
 
 
   helm:
