@@ -87,7 +87,9 @@ jobs:
         shell: bash
         run: |
           BASE_CONFIG="type=sha,format=long"
-          if [[ $GITHUB_EVENT_NAME == "schedule" ]]; then
+          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+            BASE_CONFIG+=$'\n'"type=raw,value=latest"
+          elif [[ $GITHUB_EVENT_NAME == "schedule" ]]; then
             BASE_CONFIG+=$'\n'"type=schedule,pattern=nightly"
             BASE_CONFIG+=$'\n'"type=schedule,pattern=nightly-{{date 'ddd'}}"
           elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
@@ -241,6 +243,11 @@ jobs:
             echo "Push failed (attempt $attempts). Retrying in ${delay} seconds..."
             sleep ${delay}
           done
+
+      - name: Trigger Coolify redeploy
+        if: ${{ github.ref == 'refs/heads/main' && secrets.COOLIFY_WEBHOOK_URL != '' }}
+        run: |
+          curl -s -X GET "${{ secrets.COOLIFY_WEBHOOK_URL }}" || true
 
 
   helm:
