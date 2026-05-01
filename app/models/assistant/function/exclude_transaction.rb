@@ -18,7 +18,7 @@ class Assistant::Function::ExcludeTransaction < Assistant::Function
     return { success: false, error: "No matching transactions found" } if count == 0
 
     scope.find_each do |txn|
-      txn.entry.enrich_attribute(:excluded, exclude, source: "assistant")
+      txn.entry.enrich_attribute(:excluded, exclude, source: "ai")
     end
 
     { success: true, updated_count: count, excluded: exclude }

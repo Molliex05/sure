@@ -14,10 +14,10 @@ class Assistant::Function::SetTransactionNote < Assistant::Function
     return { success: false, error: "transaction_id is required" } if transaction_id.blank?
     return { success: false, error: "note is required" } if note.nil?
 
-    txn = family.transactions.find_by(id: transaction_id)
+    txn = family.transactions.with_entry.find_by(id: transaction_id)
     return { success: false, error: "Transaction not found" } unless txn
 
-    txn.update!(notes: note.presence)
+    txn.entry.update!(notes: note.presence)
     { success: true, transaction_id: transaction_id }
   rescue ActiveRecord::RecordInvalid => e
     { success: false, error: e.message }
