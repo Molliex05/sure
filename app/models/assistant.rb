@@ -51,7 +51,11 @@ module Assistant
         Function::CreateBudget,
         Function::UpdateBudget,
         Function::DeleteBudget,
-        Function::SetCategoryBudget
+        Function::SetCategoryBudget,
+        # Skills — persistent how-to guides
+        Function::ReadSkill,
+        Function::WriteSkill,
+        Function::DeleteSkill
       ]
     end
 

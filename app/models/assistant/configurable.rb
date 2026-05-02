@@ -58,6 +58,7 @@ module Assistant::Configurable
 
       def default_instructions(preferred_currency, preferred_date_format, user = nil)
         memory_section = hermes_memory_section(user)
+        skills_section = skills_index_section(user)
 
         <<~PROMPT
           ## Your identity
@@ -120,8 +121,24 @@ module Assistant::Configurable
           - When creating categories or rules, always confirm with the user first.
           - Before bulk-updating more than 10 transactions, always confirm with the user.
 
-          #{memory_section}
+          ### Skills rules
+
+          - Before performing a complex task, call `read_skill` to check for existing guidance.
+          - After successfully completing a new type of task, call `write_skill` to document the steps for future conversations.
+          - If a skill's instructions are outdated or wrong, update it with `write_skill`.
+
+          #{skills_section}#{memory_section}
         PROMPT
+      end
+
+      def skills_index_section(user)
+        return "" if user.nil?
+
+        skills = user.family.assistant_skills.order(:name).pluck(:name, :description)
+        return "" if skills.empty?
+
+        index = skills.map { |name, desc| "- #{name}: #{desc}" }.join("\n")
+        "## Available skills\n\n#{index}\n\nUse `read_skill(name)` to load full instructions before acting.\n\n"
       end
 
       def hermes_memory_section(user)
