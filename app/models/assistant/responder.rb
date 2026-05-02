@@ -46,17 +46,9 @@ class Assistant::Responder
   private
     attr_reader :message, :instructions, :function_tool_caller, :llm
 
-    def handle_follow_up_response(response)
-      streamer = proc do |chunk|
-        case chunk.type
-        when "output_text"
-          emit(:output_text, chunk.data)
-        when "response"
-          # We do not currently support function executions for a follow-up response (avoid recursive LLM calls that could lead to high spend)
-          emit(:response, { id: chunk.data.id })
-        end
-      end
+    MAX_TOOL_CALL_ROUNDS = 5
 
+    def handle_follow_up_response(response, round: 1)
       function_tool_calls = function_tool_caller.fulfill_requests(response.function_requests)
 
       emit(:response, {
@@ -64,12 +56,37 @@ class Assistant::Responder
         function_tool_calls: function_tool_calls
       })
 
-      # Get follow-up response with tool call results
-      get_llm_response(
+      follow_up_handled = false
+
+      streamer = proc do |chunk|
+        case chunk.type
+        when "output_text"
+          emit(:output_text, chunk.data)
+        when "response"
+          follow_up_response = chunk.data
+          follow_up_handled = true
+
+          if follow_up_response.function_requests.any? && round < MAX_TOOL_CALL_ROUNDS
+            handle_follow_up_response(follow_up_response, round: round + 1)
+          else
+            emit(:response, { id: follow_up_response.id })
+          end
+        end
+      end
+
+      follow_up = get_llm_response(
         streamer: streamer,
         function_results: function_tool_calls.map(&:to_result),
         previous_response_id: response.id
       )
+
+      unless follow_up_handled
+        if follow_up&.function_requests&.any? && round < MAX_TOOL_CALL_ROUNDS
+          handle_follow_up_response(follow_up, round: round + 1)
+        elsif follow_up
+          emit(:response, { id: follow_up.id })
+        end
+      end
     end
 
     def get_llm_response(streamer:, function_results: [], previous_response_id: nil)
