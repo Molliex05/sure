@@ -26,7 +26,7 @@ class Assistant::Function::UpdateTransactionCategory < Assistant::Function
     scope = if transaction_ids.any?
       family.transactions.where(id: transaction_ids)
     else
-      family.transactions.joins(:merchant).where("LOWER(merchants.name) = ?", merchant_name.downcase)
+      family.transactions.joins(:merchant).where("LOWER(merchants.name) LIKE ?", "%#{merchant_name.downcase}%")
     end
 
     count = scope.count
@@ -53,7 +53,7 @@ class Assistant::Function::UpdateTransactionCategory < Assistant::Function
         },
         "merchant_name" => {
           type: "string",
-          description: "Update all transactions from this merchant name"
+          description: "Update all transactions from merchants whose name contains this string (partial match). E.g. 'Maxi' will match 'Maxi St-Constant' and 'Maxi Downtown'."
         }
       },
       required: [ "category_name" ]
