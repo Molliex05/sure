@@ -37,10 +37,15 @@ class Assistant::Builtin < Assistant::Base
     )
 
     latest_response_id = chat.latest_assistant_response_id
+    thinking_active = true
 
     responder.on(:output_text) do |text|
-      if assistant_message.content.blank?
+      if thinking_active
         stop_thinking
+        thinking_active = false
+      end
+
+      if assistant_message.content.blank?
         Chat.transaction do
           assistant_message.append_text!(text)
           chat.update_latest_response!(latest_response_id)
@@ -51,11 +56,14 @@ class Assistant::Builtin < Assistant::Base
     end
 
     responder.on(:response) do |data|
-      update_thinking("Analyzing your data...")
       if data[:function_tool_calls].present?
+        update_thinking("Applying changes...")
+        thinking_active = true
         assistant_message.tool_calls = data[:function_tool_calls]
         latest_response_id = data[:id]
       else
+        stop_thinking
+        thinking_active = false
         chat.update_latest_response!(data[:id])
       end
     end

@@ -18,7 +18,15 @@
     <div class="flex items-start gap-3 mb-6">
       <%= render "chats/ai_avatar" %>
 
-      <div class="prose prose--ai-chat"><%= markdown(assistant_message.content) %></div>
+      <div class="min-w-0">
+        <div class="prose prose--ai-chat"><%= markdown(assistant_message.content) %></div>
+        <% if assistant_message.failed? %>
+          <p class="text-xs text-red-500 mt-1 flex items-center gap-1">
+            <%= icon("alert-triangle", size: 12) %>
+            Response interrupted — actions may not have completed
+          </p>
+        <% end %>
+      </div>
     </div>
   <% end %>
 </div>
