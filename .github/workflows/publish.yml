@@ -244,14 +244,6 @@ jobs:
             sleep ${delay}
           done
 
-      - name: Trigger Coolify redeploy
-        if: github.ref == 'refs/heads/main'
-        env:
-          COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
-          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
-        run: |
-          [ -n "$COOLIFY_WEBHOOK_URL" ] && curl -s -X GET "$COOLIFY_WEBHOOK_URL" \
-            -H "Authorization: Bearer $COOLIFY_TOKEN" || true
 
 
   helm:
