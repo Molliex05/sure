@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_30_120000) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_02_014605) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -137,6 +137,17 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_30_120000) do
     t.index ["revoked_at"], name: "index_api_keys_on_revoked_at"
     t.index ["user_id", "source"], name: "index_api_keys_on_user_id_and_source"
     t.index ["user_id"], name: "index_api_keys_on_user_id"
+  end
+
+  create_table "assistant_skills", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "family_id", null: false
+    t.string "name", null: false
+    t.string "description", null: false
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "name"], name: "index_assistant_skills_on_family_id_and_name", unique: true
+    t.index ["family_id"], name: "index_assistant_skills_on_family_id"
   end
 
   create_table "archived_exports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1640,6 +1651,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_30_120000) do
   add_foreign_key "account_shares", "accounts"
   add_foreign_key "account_shares", "users"
   add_foreign_key "accounts", "families"
+  add_foreign_key "assistant_skills", "families"
   add_foreign_key "accounts", "imports"
   add_foreign_key "accounts", "plaid_accounts"
   add_foreign_key "accounts", "simplefin_accounts"
