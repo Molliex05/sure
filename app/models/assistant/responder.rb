@@ -126,14 +126,15 @@ class Assistant::Responder
           .ordered
           .each do |chat_message|
         if chat_message.tool_calls.any?
+          # 1. Assistant message requesting tools — content must be empty
           messages << {
             role: chat_message.role,
-            content: chat_message.content || "",
+            content: "",
             tool_calls: chat_message.tool_calls.map(&:to_tool_call)
           }
 
+          # 2. Tool result messages
           chat_message.tool_calls.map(&:to_result).each do |fn_result|
-            # Handle nil explicitly to avoid serializing to "null"
             output = fn_result[:output]
             content = if output.nil?
               ""
@@ -149,6 +150,11 @@ class Assistant::Responder
               name: fn_result[:name],
               content: content
             }
+          end
+
+          # 3. Final assistant response text (separate message after tool results)
+          if chat_message.content.present?
+            messages << { role: "assistant", content: chat_message.content }
           end
 
         elsif !chat_message.content.blank?
